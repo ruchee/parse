@@ -10,5 +10,6 @@ spl_autoload_register('autoload');
 
 function autoload ($cls_name) {
     $cls_name = strtolower($cls_name);
+    $cls_name = preg_replace('/_fetch$/', '', $cls_name);
     load_fetch($cls_name);
 }
