@@ -2,31 +2,24 @@
 
 class Fetch {
 
-    private static $_snoopy;
-
-
-    public function __construct () {
-        load_lib('snoopy');
-        if (! self::$_snoopy) self::$_snoopy = new Snoopy;
-    }
-
-
     /**
      * 获取指定网页的内容
      */
     protected function get ($url, $is_ajax = false, $use_proxy = false) {
         logger('start fetch '.$url, $is_ajax, $use_proxy);
-
-        if ($use_proxy) {  // 使用代理
-            $ret = $this->_vget($url, $is_ajax);
-        } else {  // 不使用代理
-            $ret = $this->_get($url, $is_ajax);
-        }
-
+        $ret = $this->_curl($url, $is_ajax, $use_proxy);
         logger('finished fetch '.$url, $is_ajax, $use_proxy);
 
-        if ($ret) return $ret;
-        return false;
+        return $ret ?: false;
+    }
+
+
+    /**
+     * 从链接地址获取网页内容，并转DOM对象
+     */
+    protected function url2dom ($url) {
+        load_lib('simplehtmldom');
+        return file_get_html($url);
     }
 
 
@@ -40,19 +33,26 @@ class Fetch {
 
 
     /**
-     * 不使用代理获取内容
+     * CURL模拟请求
      */
-    private function _get ($url, $is_ajax) {
-        self::$_snoopy->fetch($url);
-        return self::$_snoopy->results;
-    }
+    private function _curl ($url, $is_ajax = false, $use_proxy = false) {
+        $ch = curl_init();
 
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0;)');
+        if (parse_url($url, PHP_URL_SCHEME) == 'https') {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        }
 
-    /**
-     * 使用代理获取内容
-     */
-    private function _vget ($url, $is_ajax) {
-        load_config('agent');
+        $ret = curl_exec($ch);
+        $res = curl_getinfo($ch);
+        curl_close($ch);
+
+        return $ret;
     }
 
 }

@@ -6,7 +6,7 @@
 function load_fetch ($fetch_name) {
     $file_path = __DIR__.'/fetch/'.$fetch_name.'_fetch.php';
     if (file_exists($file_path)) {
-        include $file_path;
+        include_once $file_path;
         return true;
     }
     file_not_exists($file_path);
@@ -19,7 +19,7 @@ function load_fetch ($fetch_name) {
 function load_model ($model_name) {
     $file_path = __DIR__.'/model/'.$model_name.'_model.php';
     if (file_exists($file_path)) {
-        include $file_path;
+        include_once $file_path;
         return true;
     }
     file_not_exists($file_path);
@@ -32,7 +32,7 @@ function load_model ($model_name) {
 function load_config ($config_name) {
     $file_path = __DIR__.'/config/'.$config_name.'_config.php';
     if (file_exists($file_path)) {
-        $config = include $file_path;
+        $config = include_once $file_path;
         return $config;
     }
     file_not_exists($file_path);
@@ -45,7 +45,7 @@ function load_config ($config_name) {
 function load_lib ($lib_name) {
     $file_path = __DIR__.'/lib/'.$lib_name.'_lib.php';
     if (file_exists($file_path)) {
-        include $file_path;
+        include_once $file_path;
         return true;
     }
     file_not_exists($file_path);
